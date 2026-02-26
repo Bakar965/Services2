@@ -1,0 +1,67 @@
+local BoostsService = {}
+local DataService = require(game.ServerStorage.Packages.Data.DataService)
+Boosts.__Index = BoostsService
+
+function Boosts.new()
+	local self = setmetatable({} , BoostsService)
+	self.ActiveBoosts = {}
+	return self
+end
+
+function BoostsService:ApplyBoost(Player : Player , Boost : string , Duration : number)
+	if not self.ActiveBoosts then return end
+	
+	if Player  then
+		if not self.ActiveBoosts[Player.UserId] then
+			self.ActiveBoosts[Player.UserId] = {}
+		end
+		
+		self.ActiveBoosts[Player.UserId][Boost] = Duration
+	end
+end
+
+function BoostsService:RemoveBoost(Player : Player , Boost : string)
+	if not self.activeBoosts then return end
+	if Player then
+		self.ActiveBoosts[Player.UserId][Boost] = nil
+		if next(self.ActiveBoosts[Player.UserId] == nil ) then
+			self.ActiveBoosts[Player.UserId] = nil
+		end
+	end
+end
+
+function BoostsService:GetActiveBoosts(Player : Player)
+	if not self.ActiveBoosts then return end
+	return self.ActiveBoosts[Player.UserId]
+end
+
+function BoostsService:CheckIfDurationExpired(Player : Player , Boost : string , Duration : number)
+	if not self.ActiveBoosts[Player.UserId] then return end
+	if Player then
+		 if self.ActiveBoosts[Player.UserId][Boost] <= 0 then
+			self.ActiveBoosts[Player.UserId][Boost] = nil
+		else
+			self.ActiveBoosts[Player.UserId][Boost] = Duration
+		end
+	end
+end
+
+function BoostsService:GetBoostDuration(Player : Player , Boost : string)
+	if not self.ActiveBoosts[Player.UserId] then return end
+	if Player then
+		return self.ActiveBoosts[Player.UserId][Boost]
+	end
+end
+
+function BoostsService:UpdateBoosts(Player : Player , Data : any , Boost : string , Duration : number)
+	if not self.ActiveBoosts[Player.UserId] then return end
+	if Player then
+		if not self.ActiveBoosts[Player.UserId][Boost] then
+			self.ActiveBoosts[Player.UserId][Boost] = Duration
+		else
+			self.ActiveBoosts[Player.UserId][Boost] = self.ActiveBoosts[Player.UserId][Boost] + Duration
+		end
+	end
+end
+
+return BoostsService
